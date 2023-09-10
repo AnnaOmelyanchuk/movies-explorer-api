@@ -1,4 +1,4 @@
-const router = require('express').Router();
+const movies = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 
 const {
@@ -7,42 +7,36 @@ const {
   deleteMovie,
 } = require('../controllers/movies');
 
-router.get('/movies', celebrate({
-  headers: Joi.object().keys({
-    authorization: Joi.string(),
-  }).unknown(true),
+movies.get('/movies', celebrate({
+
   body: Joi.object().keys({
 
   }),
 }), getMovies);
 
-router.delete('/movies/:movieId', celebrate({
-  headers: Joi.object().keys({
-    authorization: Joi.string(),
-    movieId: Joi.string().length(24).hex(),
-  }).unknown(true),
+movies.delete('/movies/:movieId', celebrate({
+  params: Joi.object().keys({
+    movieId: Joi.string().length(24).hex().required(),
+  }),
   body: Joi.object().keys({
 
   }),
 }), deleteMovie);
 
-router.post('/movies', celebrate({
-  headers: Joi.object().keys({
-    authorization: Joi.string(),
-  }).unknown(true),
+movies.post('/movies', celebrate({
   body: Joi.object().keys({
-    country: Joi.string(),
-    director: Joi.string(),
-    duration: Joi.number(),
-    year: Joi.string(),
-    description: Joi.string(),
-    image: Joi.string().pattern(new RegExp('^(http|https)://[^ "]+$')),
-    trailerLink: Joi.string().pattern(new RegExp('^(http|https)://[^ "]+$')),
-    thumbnail: Joi.string().pattern(new RegExp('^(http|https)://[^ "]+$')),
-    movieId: Joi.string(),
-    nameRU: Joi.string(),
-    nameEN: Joi.string(),
+    country: Joi.string().required(),
+    director: Joi.string().required(),
+    duration: Joi.number().required(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
+    image: Joi.string().pattern(new RegExp('^(http|https)://[^ "]+$')).required(),
+    trailerLink: Joi.string().pattern(new RegExp('^(http|https)://[^ "]+$')).required(),
+    thumbnail: Joi.string().pattern(new RegExp('^(http|https)://[^ "]+$')).required(),
+    movieId: Joi.number().required(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 }), postMovie);
 
-module.exports = router;
+module.exports = movies;

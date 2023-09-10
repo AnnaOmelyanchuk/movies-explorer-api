@@ -50,15 +50,29 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, email } = req.body;
-  Users.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequesError('Ошибка в данных'));
-        return;
-      }
-      next(err);
-    });
+  if (!email) {
+    throw new BadRequesError('email не введен');
+  }
+  if (!name) {
+    throw new BadRequesError('Имя не введено');
+  } else {
+    Users.findByIdAndUpdate(req.user._id, { name, email },
+      {
+        new: true, runValidators: true,
+      })
+      .then((user) => res.send(user))
+      .catch((err) => {
+        if (err.name === 'MongoError' || err.code === 11000) {
+          next(new ConflictError('Указанный email уже занят'));
+          return;
+        }
+        if (err instanceof mongoose.Error.ValidationError) {
+          next(new BadRequesError('Ошибка в данных'));
+          return;
+        }
+        next(err);
+      });
+  }
 };
 
 module.exports.login = (req, res, next) => {
