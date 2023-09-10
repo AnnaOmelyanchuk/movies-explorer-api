@@ -20,8 +20,7 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(NODE_ENV === 'production' ? MONG_DB : mongoDb);
-mongoose.connect(`${MONG_DB}`, {
+mongoose.connect(NODE_ENV === 'production' ? MONG_DB : mongoDb, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
